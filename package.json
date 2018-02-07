@@ -1,6 +1,6 @@
 {
   "name": "@adt/json-rpc-transport-providers",
-  "version": "0.0.1-SNAPSHOT.4",
+  "version": "0.0.1-SNAPSHOT.5",
   "license": "MIT",
   "main": "dist/JsonRpcTransportProviders.cjs.js",
   "module": "dist/JsonRpcTransportProviders.esm.js",

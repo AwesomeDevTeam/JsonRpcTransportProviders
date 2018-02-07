@@ -33,7 +33,11 @@ export default [
         output: [
 
             { file: pkg.main, format: 'cjs' },
-            { file: pkg.module, format: 'es' },
+            { file: pkg.module, format: 'es' }
+        ],
+        plugins: [
+            resolve(),
+            commonjs(),
             babel({
                 exclude: "node_modules/**"
             })
