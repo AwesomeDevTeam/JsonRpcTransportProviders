@@ -4,7 +4,7 @@
  * @param {String} c.server Server address to connect to as proper url with ws or wss protocol (wss://example.com)
  * @param {Boolean} [c.reconnect=false] Reconnect flag
  * @param {Number} [c.reconnectAfter=5000] Reconnect timeout in milliseconds
- * @param {Function} [c.onMessage=function(){]] Callback with message argument which must be invoked when message arrives. By default its empty function
+ * @param {Function} [c.onMessage=function()] Callback with message argument which must be invoked when message arrives. By default its empty function
  * @param {Function} [c.serializer] Message serializer function (any) => string|ByteArray. By default it returns message as is
  * @param {Function} [c.deserializer] Message deserializer function (string|ByteArray) => any. By default it returns message as is
  * @param {Array.<String>} [c.protocols=[]] WebSocket protocols
