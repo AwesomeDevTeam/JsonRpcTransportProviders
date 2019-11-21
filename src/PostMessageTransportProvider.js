@@ -18,7 +18,7 @@ export default function PostMessageTransportProvider(c) {
     }
 
     var config = {};
-    config.receiver = c.receiver;
+    config.endpoint = c.endpoint;
     if ( "onMessage" in c  ) {
         if ( typeof c.onMessage !== "function" ) {
             throw Error("onMessage callback is not a function");
