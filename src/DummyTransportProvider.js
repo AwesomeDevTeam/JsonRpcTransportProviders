@@ -7,7 +7,7 @@
  * @param {Boolean|Function} o.isConnectedRetValue Value returned from isConnected function
  * @param {Promise|Function} [o.disconnectRetValue=Promise.resolve()] Value returned from disconnect method
  * @param {Function} o.onMessage Callback with message argument which must be invoked when message arrives
- * @param {Function} o.onDisconnect Callback which must be invoked when message arrives
+ * @param {Function} o.onDisconnect Callback which must be invoked on disconnection
  * @param {Function} o.onError Callback which must be invoked when error occurs
  * @returns {DummyTransportProvider}
  */

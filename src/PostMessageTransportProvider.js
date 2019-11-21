@@ -1,39 +1,24 @@
 /**
- * WebSocket Transport Provider
+ * PostMessage Transport Provider
  * @param {Object} c Configuration object
- * @param {String} c.server Server address to connect to as proper url with ws or wss protocol (wss://example.com)
- * @param {Boolean} [c.reconnect=false] Reconnect flag
- * @param {Number} [c.reconnectAfter=5000] Reconnect timeout in milliseconds
+ * @param {String} c.endpoint Target element to send and receive messages (window, iframe, Worker, SharedWorker port etc)
  * @param {Function} [c.onMessage=function()] Callback with message argument which must be invoked when message arrives. By default its empty function
  * @param {Function} [c.serializer] Message serializer function (any) => string|ByteArray. By default it returns message as is
  * @param {Function} [c.deserializer] Message deserializer function (string|ByteArray) => any. By default it returns message as is
- * @param {Array.<String>} [c.protocols=[]] WebSocket protocols
  * @constructor
  */
-export default function WebSocketTransportProvider(c) {
+export default function PostMessageTransportProvider(c) {
 
     if (typeof c === "undefined" || c === null) {
         throw Error("Missing configuration object");
     }
 
-    if ( "server" in c === false ) {
-        throw Error("Required param 'server' is not defined");
+    if ( "endpoint" in c === false ) {
+        throw Error("Required param 'endpoint' is not defined");
     }
 
     var config = {};
-    config.server = c.server;
-    config.reconnect = "reconnect" in c ? c.reconnect : false;
-    config.reconnectAfter = "reconnectAfter" in c ? c.reconnectAfter : 5000;
-    if ( "protocols" in c !== false ) {
-
-        // Copy from original array to new
-        config.protocols = c.protocols.map( p => p );
-
-    } else {
-
-        config.protocols = [];
-    }
-
+    config.receiver = c.receiver;
     if ( "onMessage" in c  ) {
         if ( typeof c.onMessage !== "function" ) {
             throw Error("onMessage callback is not a function");
@@ -73,59 +58,46 @@ export default function WebSocketTransportProvider(c) {
     // By default call empty function
     config.onDisconnect = () => {};
 
-    let socket;
-
-    function onWsOpen(promiseTransporter) {
-        promiseTransporter.resolve();
-    }
-
-    function onWsClose() {
-        config.onDisconnect();
-    }
-
-    function onWsError(promiseTransporter, err) {
-        promiseTransporter.reject(err);
-    }
-
-    function onWsMessage(msg) {
+    function onEndpointMessage(msg) {
 
         config.onMessage(config.deserializer(msg));
 
     }
 
-    return Object.create(WebSocketTransportProvider.prototype, {
+    let onEndpointMessageIsBinded = false;
+    let onEndpointMessageBinded = onEndpointMessage.bind(this);
+
+    return Object.create(PostMessageTransportProvider.prototype, {
 
         /**
-         * Connects to server
+         * Assigns message listener to receiver
          * @return Promise
          */
         connect : { value : function() {
 
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) =>{
+                config.endpoint.addEventListener("message", onEndpointMessageBinded );
+                onEndpointMessageIsBinded =  true;
+                resolve();
+            } );
 
-                socket = new WebSocket(config.server, config.protocols);
-
-                var promiseTransporter = { resolve  : resolve, reject : reject };
-
-                socket.addEventListener("open", onWsOpen.bind(this, promiseTransporter));
-                socket.addEventListener("close", onWsClose.bind(this));
-                socket.addEventListener("error", onWsError.bind(this, promiseTransporter));
-                socket.addEventListener("message", onWsMessage.bind(this));
-
-
-            });
         }},
 
         send : { value : function(req) {
 
-            // Second argument is for node.js websocket implementation
-            socket.send(config.serializer(req), {binary: false, mask: true});
+            config.endpoint.postMessage(req);
 
         }},
 
-        disconnect : { value : () => socket.close() },
+        disconnect : { value : () => {
 
-        isConnected : { value : () => socket.readyState === WebSocket.OPEN},
+            if ( onEndpointMessageIsBinded === true ) {
+                config.endpoint.removeEventListener("message", onEndpointMessageBinded);
+                onEndpointMessageIsBinded = false;
+            }
+        }},
+
+        isConnected : { value : () => onEndpointMessageBinded },
 
         onMessage : { value : callback => config.onMessage = callback, writable : true },
 
@@ -136,5 +108,3 @@ export default function WebSocketTransportProvider(c) {
     });
 
 }
-
-

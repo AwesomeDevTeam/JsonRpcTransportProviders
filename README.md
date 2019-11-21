@@ -2,12 +2,11 @@
 
 Transport providers for JsonRpcClient
 
-# !!! WARNING !!! NOT PRODUCTION READY
-
 ## Available providers
 
 - DummyTransportProvider
 - WebsocketTransportProvider
+- PostMessageTransportProvider
 
 ## Writing own providers
 Provider is an object, which must implement ProviderInterface.
