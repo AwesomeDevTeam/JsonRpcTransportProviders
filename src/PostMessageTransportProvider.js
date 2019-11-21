@@ -97,7 +97,7 @@ export default function PostMessageTransportProvider(c) {
             }
         }},
 
-        isConnected : { value : () => onEndpointMessageBinded },
+        isConnected : { value : () => onEndpointMessageIsBinded },
 
         onMessage : { value : callback => config.onMessage = callback, writable : true },
 
