@@ -75,7 +75,7 @@ export default function PostMessageTransportProvider(c) {
          */
         connect : { value : function() {
 
-            return new Promise((resolve) =>{
+            return new Promise((resolve) => {
                 config.endpoint.addEventListener("message", onEndpointMessageBinded );
                 onEndpointMessageIsBinded =  true;
                 resolve();
@@ -85,7 +85,7 @@ export default function PostMessageTransportProvider(c) {
 
         send : { value : function(req) {
 
-            config.endpoint.postMessage(req);
+            config.endpoint.postMessage(config.serializer(req));
 
         }},
 
